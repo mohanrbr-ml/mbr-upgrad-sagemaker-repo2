@@ -131,8 +131,8 @@ def get_pipeline(
     model_package_group_name="AbalonePackageGroup",
     pipeline_name="AbalonePipeline",
     base_job_prefix="Abalone",
-    processing_instance_type="ml.t3.medium",
-    training_instance_type="ml.t3.medium",
+    processing_instance_type="ml.t4.large",
+    training_instance_type="ml.t4.large",
 ):
     """Gets a SageMaker ML Pipeline instance working with on abalone data.
 
@@ -159,11 +159,18 @@ def get_pipeline(
         name="InputDataUrl",
         default_value=f"s3://sagemaker-servicecatalog-seedcode-{region}/dataset/abalone-dataset.csv",
     )
-
+    processing_instance_type_param = ParameterString(
+        name="ProcessingInstanceType", 
+        default_value=processing_instance_type
+    )
+    training_instance_type_param = ParameterString(
+        name="TrainingInstanceType", 
+        default_value=training_instance_type
+    )
     # processing step for feature engineering
     sklearn_processor = SKLearnProcessor(
         framework_version="0.23-1",
-        instance_type=processing_instance_type,
+        instance_type=processing_instance_type_param,
         instance_count=processing_instance_count,
         base_job_name=f"{base_job_prefix}/sklearn-abalone-preprocess",
         sagemaker_session=pipeline_session,
@@ -190,11 +197,11 @@ def get_pipeline(
         region=region,
         version="1.0-1",
         py_version="py3",
-        instance_type=training_instance_type,
+        instance_type=training_instance_type_param,
     )
     xgb_train = Estimator(
         image_uri=image_uri,
-        instance_type=training_instance_type,
+        instance_type=training_instance_type_param,
         instance_count=1,
         output_path=model_path,
         base_job_name=f"{base_job_prefix}/abalone-train",
