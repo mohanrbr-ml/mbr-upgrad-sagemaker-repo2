@@ -243,7 +243,7 @@ def get_pipeline(
     script_eval = ScriptProcessor(
         image_uri=image_uri,
         command=["python3"],
-        instance_type=processing_instance_type,
+        instance_type=processing_instance_type_param,
         instance_count=1,
         base_job_name=f"{base_job_prefix}/script-abalone-eval",
         sagemaker_session=pipeline_session,
@@ -327,9 +327,9 @@ def get_pipeline(
     pipeline = Pipeline(
         name=pipeline_name,
         parameters=[
-            processing_instance_type,
+            processing_instance_type_param ,
             processing_instance_count,
-            training_instance_type,
+            training_instance_type_param,
             model_approval_status,
             input_data,
         ],
